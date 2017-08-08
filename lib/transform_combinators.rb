@@ -14,14 +14,25 @@ class Module
 end
 
 module TransformCombinators
-  def_fnc :same, :hash_of, :array_of, :default, :scalar
+  def_fnc :same, :hash_of, :array_of, :default, :scalar, :float, :integer, :null_string, :and_then
 
-  @@same = -> a { a }
-  @@hash_of = -> fields , hash { 
+  @@same = ->a { a }
+  @@hash_of = ->fields, hash {
     hash ||= {}
     fields.map { |(key, fn)| [key, fn.(hash[key])] }.to_h
   }.curry
-  @@array_of = -> fn, value { value.kind_of?(Array) ?  value.map(&fn) : [] }.curry
-  @@default = -> default, a { a.nil? ? default : a  }.curry
-  @@scalar = -> a { a.kind_of?(Array) || a.kind_of?(Hash) ? nil : a }
+  @@array_of = ->fn, value { value.kind_of?(Array) ? value.map(&fn) : [] }.curry
+  @@default = ->default, a { a.nil? ? default : a }.curry
+  @@scalar = ->a { a.kind_of?(Array) || a.kind_of?(Hash) ? nil : a }
+  @@integer = ->a { Integer(a) }
+  @@float = ->a { Float(a) }
+  @@null_string = ->a {
+    if !a.nil?
+      b = a.strip
+      b.empty? ? nil : a
+    else
+      nil
+    end
+  }
+  @@and_then = ->fn,a { a.nil? ? nil : fn.(a) }.curry
 end
