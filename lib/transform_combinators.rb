@@ -1,20 +1,8 @@
 require "transform_combinators/version"
-
-class Module
-  def def_fnc(*syms)
-    syms.each do |sym|
-      raise NameError.new("invalid function name: #{sym}") unless /\A[_A-Za-z]\w*\z/ =~ sym
-      class_eval(<<-EOS, __FILE__, __LINE__ + 1)
-        def #{sym}
-            @@#{sym}
-        end
-      EOS
-    end
-  end
-end
+require 'fp_rb'
 
 module TransformCombinators
-  def_fnc :same, :hash_of, :array_of, :default, :scalar, :float, :integer, :null_string, :and_then
+  def_fn :same, :hash_of, :array_of, :default, :scalar, :float, :integer, :null_string, :and_then
 
   @@same = ->a { a }
   @@hash_of = ->fields, hash {
