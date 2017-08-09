@@ -9,18 +9,16 @@ module TransformCombinators
     hash ||= {}
     fields.map { |(key, fn)| [key, fn.(hash[key])] }.to_h
   }.curry
-  @@array_of = ->fn, value { value.kind_of?(Array) ? value.map(&fn) : [] }.curry
+  @@array_of = ->fn, value { value.is_a?(Array) ? value.map(&fn) : [] }.curry
   @@default = ->default, a { a.nil? ? default : a }.curry
-  @@scalar = ->a { a.kind_of?(Array) || a.kind_of?(Hash) ? nil : a }
+  @@scalar = ->a { a.is_a?(Array) || a.is_a?(Hash) ? nil : a }
   @@integer = ->a { Integer(a) }
   @@float = ->a { Float(a) }
   @@null_string = ->a {
-    if !a.nil?
+    unless a.nil?
       b = a.strip
       b.empty? ? nil : a
-    else
-      nil
     end
   }
-  @@and_then = ->fn,a { a.nil? ? nil : fn.(a) }.curry
+  @@and_then = ->fn, a { a.nil? ? nil : fn.(a) }.curry
 end
